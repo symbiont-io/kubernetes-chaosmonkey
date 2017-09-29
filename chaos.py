@@ -13,7 +13,8 @@ from kubernetes.client.rest import ApiException
 from http import HTTPStatus
 
 
-KILL_FREQUENCY = int(os.environ.get('CHAOS_MONKEY_KILL_FREQUENCY_SECONDS', 300))
+POD_NAME = os.environ.get('CHAOS_MONKEY_POD_NAME')
+KILL_FREQUENCY = int(os.environ.get('CHAOS_MONKEY_KILL_FREQUENCY_UPPER_LIMIT', 36000))
 LOGGER = logging.getLogger(__name__)
 
 logging.basicConfig(level=logging.INFO)
@@ -25,7 +26,7 @@ v1 = kubernetes.client.CoreV1Api()
 
 while True:
     pods = v1.list_pod_for_all_namespaces().items
-    pod = random.choice(pods)
+    pod = next(pod for pod in pods if pod.metadata.labels["name"] == POD_NAME)
     LOGGER.info("Terminating pod %s/%s", pod.metadata.namespace, pod.metadata.name)
     event_name = "Chaos monkey kill pod %s" % pod.metadata.name
     v1.delete_namespaced_pod(
@@ -66,4 +67,4 @@ while True:
             v1.create_namespaced_event(namespace=pod.metadata.namespace, body=new_event)
         else:
             raise
-    time.sleep(KILL_FREQUENCY)
+    time.sleep(random.randrange(30, KILL_FREQUENCY))
