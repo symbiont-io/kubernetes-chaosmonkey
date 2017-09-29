@@ -20,7 +20,7 @@ spec:
         - name: docker-registry-key
       containers:
         - name: chaos-monkey
-          image: "us.gcr.io/development-148212/chaos_monkey:v.0.0.1"
+          image: "us.gcr.io/development-148212/chaos_monkey:v.0.0.2"
           resources:
             requests:
               memory: "32Mi"
