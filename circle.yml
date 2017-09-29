@@ -11,7 +11,7 @@ jobs:
       - run:
           name: setup_env
           command: |
-            echo ${GCLOUD_SERVICE_KEY_PROJECT_DEVELOPMENT} | base64 --decode > ${HOME}/gcloud-service-key-project-development.json
+            echo ${GCLOUD_SERVICE_KEY} | base64 --decode > ${HOME}/gcloud-service-key-project-development.json
             gcloud auth activate-service-account --key-file ${HOME}/gcloud-service-key-project-development.json
             gcloud config set project development-148212
       - run:
@@ -30,3 +30,4 @@ workflows:
   build_and_test:
     jobs:
       - build
+          context: org-global
