@@ -1,0 +1,32 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: quay.io/symbiont/circleci-2-executor
+
+    steps:
+      - checkout
+      - setup_remote_docker:
+          reusable: true
+      - run:
+          name: setup_env
+          command: |
+            echo ${GCLOUD_SERVICE_KEY_PROJECT_DEVELOPMENT} | base64 --decode > ${HOME}/gcloud-service-key-project-development.json
+            gcloud auth activate-service-account --key-file ${HOME}/gcloud-service-key-project-development.json
+            gcloud config set project development-148212
+      - run:
+          name: build
+          command: |
+            gcloud docker -- build -t chaos_monkey .
+      - deploy:
+          name: push
+          command: |
+            CIRCLE_HASH_TAG=$(echo $CIRCLE_SHA1 | head -c 8)
+            gcloud docker -- tag chaos_monkey us.gcr.io/development-148212/chaos_monkey:$CIRCLE_HASH_TAG
+            gcloud docker -- push us.gcr.io/development-148212/chaos_monkey:$CIRCLE_HASH_TAG
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - build
