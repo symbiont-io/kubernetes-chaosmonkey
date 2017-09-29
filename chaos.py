@@ -67,4 +67,6 @@ while True:
             v1.create_namespaced_event(namespace=pod.metadata.namespace, body=new_event)
         else:
             raise
-    time.sleep(random.randrange(30, KILL_FREQUENCY))
+    sleep_time = random.randrange(30, KILL_FREQUENCY)
+    LOGGER.info("Sleeping for {}".format(sleep_time))
+    time.sleep(sleep_time)

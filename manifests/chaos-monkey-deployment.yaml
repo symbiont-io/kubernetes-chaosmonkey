@@ -1,7 +1,14 @@
+kind: Deployment
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: chaos-monkey
+  namespace: default
+  labels:
+    symbiont: "true"
+    component: frontend
+    name: chaos-monkey
+    symbiont.io/nodectld-managed: "true"
 spec:
   replicas: 1
   template:
@@ -9,6 +16,8 @@ spec:
       labels:
         app: chaos-monkey
     spec:
+      imagePullSecrets:
+        - name: docker-registry-key
       containers:
         - name: chaos-monkey
           image: "us.gcr.io/development-148212/chaos_monkey:v.0.0.1"
